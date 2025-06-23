@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Bot</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 95%;
+            max-width: 1200px;
+            height: 85vh;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 320px;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 85%;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        
+        .user-message {
+            background: #2563eb;
+            color: white;
+            margin-left: auto;
+        }
+        
+        .bot-message {
+            background: white;
+            border: 1px solid #e5e7eb;
+            margin-right: auto;
+            color: #374151;
+        }
+        
+        .bot-message p {
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+        
+        .bot-message p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .bot-message ul, .bot-message ol {
+            margin: 12px 0;
+            padding-left: 20px;
+        }
+        
+        .bot-message li {
+            margin-bottom: 6px;
+            line-height: 1.6;
+        }
+        
+        .bot-message strong {
+            color: #1f2937;
+            font-weight: 600;
+        }
+        
+        .input-area {
+            padding: 25px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 30px;
+            outline: none;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .chat-input:focus {
+            border-color: #2563eb;
+        }
+        
+        .send-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .send-btn:hover {
+            background: #1d4ed8;
+        }
+        
+        .upload-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            margin-bottom: 15px;
+            color: #374151;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .upload-area {
+            border: 3px dashed #d1d5db;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: #2563eb;
+            background: #f0f9ff;
+        }
+        
+        .email-form {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .email-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .email-textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .email-btn {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+        }
+        
+        .email-btn:hover {
+            background: #047857;
+        }
+        
+        .file-list {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .file-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+        
+        .toggle-section {
+            cursor: pointer;
+            padding: 8px 0;
+            user-select: none;
+        }
+        
+        .toggle-section:hover {
+            color: #2563eb;
+        }
+        
+        .collapsible {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .collapsible.open {
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h3 style="margin-bottom: 25px; color: #374151; font-size: 18px;">📚 Add Content</h3>
+            
+            <!-- File Upload Section -->
+            <div class="upload-section">
+                <div class="section-title toggle-section" onclick="toggleSection('fileSection')">
+                    📄 Upload Files ⬇️
+                </div>
+                <div id="fileSection" class="collapsible open">
+                    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                        <div style="font-size: 16px; margin-bottom: 8px;">Click to upload</div>
+                        <div style="font-size: 12px; color: #6b7280;">
+                            PDF • Word • PowerPoint • TXT • Email (.eml)
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.pptx,.ppt,.txt,.eml,.msg" multiple>
+                </div>
+            </div>
+            
+            <!-- Email Input Section -->
+            <div class="upload-section">
+                <div class="section-title toggle-section" onclick="toggleSection('emailSection')">
+                    📧 Add Email ⬇️
+                </div>
+                <div id="emailSection" class="collapsible">
+                    <div class="email-form">
+                        <input type="text" id="emailSubject" class="email-input" placeholder="Email Subject">
+                        <input type="email" id="emailFrom" class="email-input" placeholder="From: email@example.com">
+                        <textarea id="emailBody" class="email-textarea" placeholder="Email content..."></textarea>
+                        <button class="email-btn" onclick="submitEmail()">Add Email</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="uploadStatus"></div>
+            
+            <div class="file-list">
+                <h4 style="margin-bottom: 15px; color: #374151;">📁 Loaded Content</h4>
+                <div id="documentList">No content uploaded yet</div>
+            </div>
+        </div>
+        
+        <div class="main-chat">
+            <div class="header">
+                <h2 style="margin-bottom: 8px;">🤖 Knowledge Bot</h2>
+                <p style="opacity: 0.9; font-size: 16px;">Ask me anything about your uploaded documents and emails!</p>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <strong>👋 Welcome!</strong><br><br>
+                    I can help you find information from:<br>
+                    • 📄 Documents (PDF, Word, PowerPoint, TXT)<br>
+                    • 📧 Emails (upload .eml files or paste content)<br>
+                    • 🧠 General knowledge<br><br>
+                    Upload some content and start asking questions!
+                </div>
+            </div>
+            
+            <div class="input-area">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your documents, emails, or anything..." onkeypress="handleKeyPress(event)">
+                <button class="send-btn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+        
+        document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+        
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('open');
+        }
+        
+        async function handleFileUpload(event) {
+            const files = event.target.files;
+            const statusDiv = document.getElementById('uploadStatus');
+            
+            for (let file of files) {
+                statusDiv.innerHTML = `<div class="status">⏳ Uploading ${file.name}...</div>`;
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                try {
+                    const response = await fetch(`${API_BASE}/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        statusDiv.innerHTML = `<div class="status success">✅ ${result.message}</div>`;
+                        loadDocuments();
+                    } else {
+                        statusDiv.innerHTML = `<div class="status error">❌ ${result.message}</div>`;
+                    }
+                } catch (error) {
+                    statusDiv.innerHTML = `<div class="status error">❌ Upload failed: ${error.message}</div>`;
+                }
+            }
+        }
+        
+        async function submitEmail() {
+            const subject = document.getElementById('emailSubject').value;
+            const from = document.getElementById('emailFrom').value;
+            const body = document.getElementById('emailBody').value;
+            
+            if (!subject || !body) {
+                document.getElementById('uploadStatus').innerHTML = `<div class="status error">❌ Please fill in subject and body</div>`;
+                return;
+            }
+            
+            const statusDiv = document.getElementById('uploadStatus');
+            statusDiv.innerHTML = `<div class="status">⏳ Processing email...</div>`;
+            
+            const formData = new FormData();
+            formData.append('subject', subject);
+            formData.append('from_email', from || 'unknown@example.com');
+            formData.append('body', body);
+            
+            try {
+                const response = await fetch(`${API_BASE}/email`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    statusDiv.innerHTML = `<div class="status success">✅ ${result.message}</div>`;
+                    
+                    // Clear form
+                    document.getElementById('emailSubject').value = '';
+                    document.getElementById('emailFrom').value = '';
+                    document.getElementById('emailBody').value = '';
+                    
+                    loadDocuments();
+                } else {
+                    statusDiv.innerHTML = `<div class="status error">❌ ${result.message}</div>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function loadDocuments() {
+            try {
+                const response = await fetch(`${API_BASE}/documents`);
+                const data = await response.json();
+                
+                const listDiv = document.getElementById('documentList');
+                
+                if (data.total_documents === 0) {
+                    listDiv.innerHTML = 'No content uploaded yet';
+                } else {
+                    listDiv.innerHTML = data.documents.map(doc => {
+                        return `<div class="file-item">${doc.icon} ${doc.filename}</div>`;
+                    }).join('');
+                }
+            } catch (error) {
+                console.error('Failed to load documents:', error);
+            }
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            const loadingId = addMessage('🤔 Thinking...', 'bot');
+            
+            try {
+                const formData = new FormData();
+                formData.append('question', message);
+                
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                document.getElementById(loadingId).remove();
+                addMessage(result.answer + (result.source || ''), 'bot');
+                
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                addMessage('❌ Sorry, there was an error processing your request.', 'bot');
+            }
+        }
+        
+        function formatBotMessage(text) {
+            let formatted = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/^[-•*]\s+(.+)$/gm, '<li>$1</li>')
+                .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+            
+            if (!formatted.includes('<p>')) {
+                formatted = '<p>' + formatted + '</p>';
+            }
+            
+            formatted = formatted.replace(/(<li>.*?<\/li>)(?:\s*<li>.*?<\/li>)*/g, function(match) {
+                return '<ul>' + match + '</ul>';
+            });
+            
+            return formatted;
+        }
+        
+        function addMessage(text, sender) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageId = 'msg-' + Date.now();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.id = messageId;
+            messageDiv.className = `message ${sender}-message`;
+            
+            if (sender === 'bot') {
+                messageDiv.innerHTML = formatBotMessage(text);
+            } else {
+                messageDiv.textContent = text;
+            }
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            return messageId;
+        }
+        
+        loadDocuments();
+    </script>
+</body>
+</html>
