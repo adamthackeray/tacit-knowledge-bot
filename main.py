@@ -203,7 +203,7 @@ async def chat(question: str = Form(...)):
         
         # Get AI response using Azure OpenAI API
         response = openai.ChatCompletion.create(
-            engine="gpt-35-turbo",  # Azure uses 'engine' instead of 'model'
+            engine="gpt-4",  # Azure uses 'engine' instead of 'model'
             messages=[
                 {"role": "system", "content": "You are a helpful knowledge assistant. Be clear, concise, and cite sources when using document information."},
                 {"role": "user", "content": prompt}
