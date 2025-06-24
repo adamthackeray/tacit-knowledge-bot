@@ -1,5 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import os
 import PyPDF2
 import docx
@@ -37,6 +39,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve static files
+try:
+    app.mount("/static", StaticFiles(directory="static"), name="static")
+except:
+    pass
 
 def extract_text_from_pdf(file_content: bytes) -> str:
     """Extract text from PDF file"""
@@ -101,7 +109,12 @@ def find_relevant_documents(question: str, documents: List[dict], threshold: int
 
 @app.get("/")
 def read_root():
-    """Root endpoint"""
+    """Serve the web interface"""
+    return FileResponse('static/index.html')
+
+@app.get("/api")
+def api_status():
+    """API status endpoint"""
     return {
         "message": "🤖 Tacit Knowledge Bot is LIVE!",
         "status": "healthy",
@@ -182,8 +195,6 @@ async def chat(question: str = Form(...)):
             }
         
         logger.info(f"Processing question: {question}")
-        logger.info(f"About to call Azure OpenAI with engine: gpt-35-turbo")
-        logger.info(f"Endpoint: {openai.api_base}")
         
         # Find relevant documents
         relevant_docs = find_relevant_documents(question, documents, threshold=1)
