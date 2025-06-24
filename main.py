@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 import os
 import PyPDF2
 import docx
@@ -110,7 +110,27 @@ def find_relevant_documents(question: str, documents: List[dict], threshold: int
 @app.get("/")
 def read_root():
     """Serve the web interface"""
-    return FileResponse('static/index.html')
+    if os.path.exists('static/index.html'):
+        return FileResponse('static/index.html')
+    else:
+        # Inline HTML if static file not found
+        html_content = """
+        <!DOCTYPE html>
+        <html><head><title>Tacit Knowledge Bot</title></head>
+        <body style="font-family: Arial; padding: 40px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+            <div style="background: white; padding: 40px; border-radius: 20px; max-width: 600px; margin: 0 auto;">
+                <h1>🤖 Tacit Knowledge Bot</h1>
+                <p>Your AI assistant is running! Use the API endpoints:</p>
+                <ul style="text-align: left;">
+                    <li><strong>/docs</strong> - Interactive API documentation</li>
+                    <li><strong>/upload</strong> - Upload documents</li>
+                    <li><strong>/chat</strong> - Chat with the bot</li>
+                </ul>
+                <a href="/docs" style="background: #2563eb; color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; display: inline-block; margin-top: 20px;">Try the API</a>
+            </div>
+        </body></html>
+        """
+        return HTMLResponse(content=html_content)
 
 @app.get("/api")
 def api_status():
