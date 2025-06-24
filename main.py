@@ -182,6 +182,8 @@ async def chat(question: str = Form(...)):
             }
         
         logger.info(f"Processing question: {question}")
+        logger.info(f"About to call Azure OpenAI with engine: gpt-35-turbo")
+        logger.info(f"Endpoint: {openai.api_base}")
         
         # Find relevant documents
         relevant_docs = find_relevant_documents(question, documents, threshold=1)
@@ -203,7 +205,7 @@ async def chat(question: str = Form(...)):
         
         # Get AI response using Azure OpenAI API
         response = openai.ChatCompletion.create(
-            engine="gpt-4",  # Azure uses 'engine' instead of 'model'
+            engine="gpt-35-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful knowledge assistant. Be clear, concise, and cite sources when using document information."},
                 {"role": "user", "content": prompt}
