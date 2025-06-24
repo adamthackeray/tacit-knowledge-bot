@@ -3,67 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Knowledge Bot</title>
+    <title>Tacit Knowledge Bot</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
         
         .container {
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            width: 95%;
-            max-width: 1200px;
-            height: 85vh;
+            width: 100%;
+            max-width: 800px;
+            height: 80vh;
             display: flex;
+            flex-direction: column;
             overflow: hidden;
-        }
-        
-        .sidebar {
-            width: 320px;
-            background: #f8f9fa;
-            border-right: 1px solid #e9ecef;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-        
-        .main-chat {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
         }
         
         .header {
             background: #2563eb;
             color: white;
-            padding: 25px;
+            padding: 30px;
             text-align: center;
         }
         
-        .chat-messages {
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .main-content {
             flex: 1;
-            padding: 25px;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .upload-section {
+            padding: 30px;
+            border-bottom: 1px solid #e5e7eb;
             background: #f8fafc;
         }
         
-        .message {
+        .upload-area {
+            border: 3px dashed #d1d5db;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: #2563eb;
+            background: #f0f9ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        
+        .chat-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+        }
+        
+        .messages {
+            flex: 1;
+            overflow-y: auto;
             margin-bottom: 20px;
-            padding: 20px;
+            max-height: 300px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 15px 20px;
             border-radius: 15px;
             max-width: 85%;
             line-height: 1.6;
-            font-size: 15px;
         }
         
         .user-message {
@@ -73,49 +106,22 @@
         }
         
         .bot-message {
-            background: white;
-            border: 1px solid #e5e7eb;
+            background: #f1f5f9;
+            color: #334155;
             margin-right: auto;
-            color: #374151;
         }
         
-        .bot-message p {
-            margin-bottom: 12px;
-            line-height: 1.7;
-        }
-        
-        .bot-message p:last-child {
-            margin-bottom: 0;
-        }
-        
-        .bot-message ul, .bot-message ol {
-            margin: 12px 0;
-            padding-left: 20px;
-        }
-        
-        .bot-message li {
-            margin-bottom: 6px;
-            line-height: 1.6;
-        }
-        
-        .bot-message strong {
-            color: #1f2937;
-            font-weight: 600;
-        }
-        
-        .input-area {
-            padding: 25px;
-            background: white;
-            border-top: 1px solid #e5e7eb;
+        .input-container {
             display: flex;
             gap: 15px;
+            align-items: center;
         }
         
         .chat-input {
             flex: 1;
             padding: 15px 20px;
             border: 2px solid #e5e7eb;
-            border-radius: 30px;
+            border-radius: 25px;
             outline: none;
             font-size: 16px;
             transition: border-color 0.3s;
@@ -129,8 +135,8 @@
             background: #2563eb;
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 30px;
+            padding: 15px 25px;
+            border-radius: 25px;
             cursor: pointer;
             font-weight: 600;
             transition: background 0.3s;
@@ -140,99 +146,9 @@
             background: #1d4ed8;
         }
         
-        .upload-section {
-            margin-bottom: 30px;
-        }
-        
-        .section-title {
-            margin-bottom: 15px;
-            color: #374151;
-            font-size: 16px;
-            font-weight: 600;
-        }
-        
-        .upload-area {
-            border: 3px dashed #d1d5db;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .upload-area:hover {
-            border-color: #2563eb;
-            background: #f0f9ff;
-        }
-        
-        .email-form {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .email-input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        
-        .email-textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .email-btn {
-            background: #059669;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            width: 100%;
-        }
-        
-        .email-btn:hover {
-            background: #047857;
-        }
-        
-        .file-list {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-            max-height: 250px;
-            overflow-y: auto;
-        }
-        
-        .file-item {
-            padding: 10px 0;
-            border-bottom: 1px solid #f3f4f6;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .file-item:last-child {
-            border-bottom: none;
-        }
-        
-        #fileInput {
-            display: none;
+        .send-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
         }
         
         .status {
@@ -240,116 +156,104 @@
             padding: 12px;
             border-radius: 8px;
             font-size: 14px;
+            text-align: center;
         }
         
         .success { background: #d1fae5; color: #065f46; }
         .error { background: #fee2e2; color: #991b1b; }
+        .info { background: #dbeafe; color: #1e40af; }
         
-        .toggle-section {
-            cursor: pointer;
-            padding: 8px 0;
-            user-select: none;
+        #fileInput { display: none; }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
         
-        .toggle-section:hover {
-            color: #2563eb;
-        }
-        
-        .collapsible {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-        
-        .collapsible.open {
-            max-height: 500px;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
-            <h3 style="margin-bottom: 25px; color: #374151; font-size: 18px;">📚 Add Content</h3>
-            
-            <!-- File Upload Section -->
-            <div class="upload-section">
-                <div class="section-title toggle-section" onclick="toggleSection('fileSection')">
-                    📄 Upload Files ⬇️
-                </div>
-                <div id="fileSection" class="collapsible open">
-                    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-                        <div style="font-size: 16px; margin-bottom: 8px;">Click to upload</div>
-                        <div style="font-size: 12px; color: #6b7280;">
-                            PDF • Word • PowerPoint • TXT • Email (.eml)
-                        </div>
-                    </div>
-                    <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.pptx,.ppt,.txt,.eml,.msg" multiple>
-                </div>
-            </div>
-            
-            <!-- Email Input Section -->
-            <div class="upload-section">
-                <div class="section-title toggle-section" onclick="toggleSection('emailSection')">
-                    📧 Add Email ⬇️
-                </div>
-                <div id="emailSection" class="collapsible">
-                    <div class="email-form">
-                        <input type="text" id="emailSubject" class="email-input" placeholder="Email Subject">
-                        <input type="email" id="emailFrom" class="email-input" placeholder="From: email@example.com">
-                        <textarea id="emailBody" class="email-textarea" placeholder="Email content..."></textarea>
-                        <button class="email-btn" onclick="submitEmail()">Add Email</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="uploadStatus"></div>
-            
-            <div class="file-list">
-                <h4 style="margin-bottom: 15px; color: #374151;">📁 Loaded Content</h4>
-                <div id="documentList">No content uploaded yet</div>
-            </div>
+        <div class="header">
+            <h1>🤖 Tacit Knowledge Bot</h1>
+            <p>Upload documents and ask questions!</p>
         </div>
         
-        <div class="main-chat">
-            <div class="header">
-                <h2 style="margin-bottom: 8px;">🤖 Knowledge Bot</h2>
-                <p style="opacity: 0.9; font-size: 16px;">Ask me anything about your uploaded documents and emails!</p>
-            </div>
-            
-            <div class="chat-messages" id="chatMessages">
-                <div class="message bot-message">
-                    <strong>👋 Welcome!</strong><br><br>
-                    I can help you find information from:<br>
-                    • 📄 Documents (PDF, Word, PowerPoint, TXT)<br>
-                    • 📧 Emails (upload .eml files or paste content)<br>
-                    • 🧠 General knowledge<br><br>
-                    Upload some content and start asking questions!
+        <div class="main-content">
+            <div class="upload-section">
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div style="font-size: 1.5em; margin-bottom: 10px;">📁 Drop files here or click to upload</div>
+                    <div style="color: #6b7280;">PDF • Word • PowerPoint • TXT files supported</div>
                 </div>
+                <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.pptx,.ppt,.txt" multiple>
+                <div id="uploadStatus"></div>
             </div>
             
-            <div class="input-area">
-                <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your documents, emails, or anything..." onkeypress="handleKeyPress(event)">
-                <button class="send-btn" onclick="sendMessage()">Send</button>
+            <div class="chat-section">
+                <div class="messages" id="messages">
+                    <div class="message bot-message">
+                        <strong>👋 Welcome!</strong><br><br>
+                        I'm your personal AI assistant. Upload some documents above, then ask me questions about them!<br><br>
+                        I can help you find information from PDFs, Word docs, PowerPoints, and text files.
+                    </div>
+                </div>
+                
+                <div class="input-container">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything about your documents..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const API_BASE = 'http://127.0.0.1:8000';
+        const API_BASE = window.location.origin;
         
+        // File upload handling
         document.getElementById('fileInput').addEventListener('change', handleFileUpload);
         
-        function toggleSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            section.classList.toggle('open');
+        // Drag and drop
+        const uploadArea = document.querySelector('.upload-area');
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+        
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            processFiles(files);
         }
         
         async function handleFileUpload(event) {
             const files = event.target.files;
+            processFiles(files);
+        }
+        
+        async function processFiles(files) {
             const statusDiv = document.getElementById('uploadStatus');
             
             for (let file of files) {
-                statusDiv.innerHTML = `<div class="status">⏳ Uploading ${file.name}...</div>`;
+                statusDiv.innerHTML = `<div class="status info">⏳ Uploading ${file.name}...</div>`;
                 
                 const formData = new FormData();
                 formData.append('file', file);
@@ -364,7 +268,7 @@
                     
                     if (result.status === 'success') {
                         statusDiv.innerHTML = `<div class="status success">✅ ${result.message}</div>`;
-                        loadDocuments();
+                        addMessage(`📄 Uploaded: ${file.name}`, 'bot');
                     } else {
                         statusDiv.innerHTML = `<div class="status error">❌ ${result.message}</div>`;
                     }
@@ -374,84 +278,29 @@
             }
         }
         
-        async function submitEmail() {
-            const subject = document.getElementById('emailSubject').value;
-            const from = document.getElementById('emailFrom').value;
-            const body = document.getElementById('emailBody').value;
-            
-            if (!subject || !body) {
-                document.getElementById('uploadStatus').innerHTML = `<div class="status error">❌ Please fill in subject and body</div>`;
-                return;
-            }
-            
-            const statusDiv = document.getElementById('uploadStatus');
-            statusDiv.innerHTML = `<div class="status">⏳ Processing email...</div>`;
-            
-            const formData = new FormData();
-            formData.append('subject', subject);
-            formData.append('from_email', from || 'unknown@example.com');
-            formData.append('body', body);
-            
-            try {
-                const response = await fetch(`${API_BASE}/email`, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    statusDiv.innerHTML = `<div class="status success">✅ ${result.message}</div>`;
-                    
-                    // Clear form
-                    document.getElementById('emailSubject').value = '';
-                    document.getElementById('emailFrom').value = '';
-                    document.getElementById('emailBody').value = '';
-                    
-                    loadDocuments();
-                } else {
-                    statusDiv.innerHTML = `<div class="status error">❌ ${result.message}</div>`;
-                }
-            } catch (error) {
-                statusDiv.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
-            }
-        }
-        
-        async function loadDocuments() {
-            try {
-                const response = await fetch(`${API_BASE}/documents`);
-                const data = await response.json();
-                
-                const listDiv = document.getElementById('documentList');
-                
-                if (data.total_documents === 0) {
-                    listDiv.innerHTML = 'No content uploaded yet';
-                } else {
-                    listDiv.innerHTML = data.documents.map(doc => {
-                        return `<div class="file-item">${doc.icon} ${doc.filename}</div>`;
-                    }).join('');
-                }
-            } catch (error) {
-                console.error('Failed to load documents:', error);
-            }
-        }
-        
+        // Chat functionality
         function handleKeyPress(event) {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
                 sendMessage();
             }
         }
         
         async function sendMessage() {
             const input = document.getElementById('chatInput');
+            const sendBtn = document.getElementById('sendBtn');
             const message = input.value.trim();
             
             if (!message) return;
             
+            // Disable input while processing
+            input.disabled = true;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<div class="loading"></div>';
+            
+            // Add user message
             addMessage(message, 'user');
             input.value = '';
-            
-            const loadingId = addMessage('🤔 Thinking...', 'bot');
             
             try {
                 const formData = new FormData();
@@ -463,42 +312,22 @@
                 });
                 
                 const result = await response.json();
-                
-                document.getElementById(loadingId).remove();
-                addMessage(result.answer + (result.source || ''), 'bot');
+                addMessage(result.answer, 'bot');
                 
             } catch (error) {
-                document.getElementById(loadingId).remove();
-                addMessage('❌ Sorry, there was an error processing your request.', 'bot');
+                addMessage('Sorry, there was an error processing your request. Please try again.', 'bot');
+            } finally {
+                // Re-enable input
+                input.disabled = false;
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = 'Send';
+                input.focus();
             }
-        }
-        
-        function formatBotMessage(text) {
-            let formatted = text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/^[-•*]\s+(.+)$/gm, '<li>$1</li>')
-                .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
-                .replace(/\n\n/g, '</p><p>')
-                .replace(/\n/g, '<br>');
-            
-            if (!formatted.includes('<p>')) {
-                formatted = '<p>' + formatted + '</p>';
-            }
-            
-            formatted = formatted.replace(/(<li>.*?<\/li>)(?:\s*<li>.*?<\/li>)*/g, function(match) {
-                return '<ul>' + match + '</ul>';
-            });
-            
-            return formatted;
         }
         
         function addMessage(text, sender) {
-            const messagesDiv = document.getElementById('chatMessages');
-            const messageId = 'msg-' + Date.now();
-            
+            const messagesDiv = document.getElementById('messages');
             const messageDiv = document.createElement('div');
-            messageDiv.id = messageId;
             messageDiv.className = `message ${sender}-message`;
             
             if (sender === 'bot') {
@@ -509,11 +338,19 @@
             
             messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            
-            return messageId;
         }
         
-        loadDocuments();
+        function formatBotMessage(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+        
+        // Focus on input when page loads
+        window.addEventListener('load', () => {
+            document.getElementById('chatInput').focus();
+        });
     </script>
 </body>
 </html>
