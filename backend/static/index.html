@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tacit Knowledge Bot</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .upload-section {
+            padding: 30px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f8fafc;
+        }
+        
+        .upload-area {
+            border: 3px dashed #d1d5db;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: #2563eb;
+            background: #f0f9ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        
+        .chat-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+        }
+        
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            max-height: 300px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 15px;
+            max-width: 85%;
+            line-height: 1.6;
+        }
+        
+        .user-message {
+            background: #2563eb;
+            color: white;
+            margin-left: auto;
+        }
+        
+        .bot-message {
+            background: #f1f5f9;
+            color: #334155;
+            margin-right: auto;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            outline: none;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .chat-input:focus {
+            border-color: #2563eb;
+        }
+        
+        .send-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .send-btn:hover {
+            background: #1d4ed8;
+        }
+        
+        .send-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+        .info { background: #dbeafe; color: #1e40af; }
+        
+        #fileInput { display: none; }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Tacit Knowledge Bot</h1>
+            <p>Upload documents and ask questions!</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="upload-section">
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div style="font-size: 1.5em; margin-bottom: 10px;">📁 Drop files here or click to upload</div>
+                    <div style="color: #6b7280;">PDF • Word • PowerPoint • TXT files supported</div>
+                </div>
+                <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.pptx,.ppt,.txt" multiple>
+                <div id="uploadStatus"></div>
+            </div>
+            
+            <div class="chat-section">
+                <div class="messages" id="messages">
+                    <div class="message bot-message">
+                        <strong>👋 Welcome!</strong><br><br>
+                        I'm your personal AI assistant. Upload some documents above, then ask me questions about them!<br><br>
+                        I can help you find information from PDFs, Word docs, PowerPoints, and text files.
+                    </div>
+                </div>
+                
+                <div class="input-container">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything about your documents..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        
+        // File upload handling
+        document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+        
+        // Drag and drop
+        const uploadArea = document.querySelector('.upload-area');
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+        
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            processFiles(files);
+        }
+        
+        async function handleFileUpload(event) {
+            const files = event.target.files;
+            processFiles(files);
+        }
+        
+        async function processFiles(files) {
+            const statusDiv = document.getElementById('uploadStatus');
+            
+            for (let file of files) {
+                statusDiv.innerHTML = `<div class="status info">⏳ Uploading ${file.name}...</div>`;
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                try {
+                    const response = await fetch(`${API_BASE}/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        statusDiv.innerHTML = `<div class="status success">✅ ${result.message}</div>`;
+                        addMessage(`📄 Uploaded: ${file.name}`, 'bot');
+                    } else {
+                        statusDiv.innerHTML = `<div class="status error">❌ ${result.message}</div>`;
+                    }
+                } catch (error) {
+                    statusDiv.innerHTML = `<div class="status error">❌ Upload failed: ${error.message}</div>`;
+                }
+            }
+        }
+        
+        // Chat functionality
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Disable input while processing
+            input.disabled = true;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<div class="loading"></div>';
+            
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+            
+            try {
+                const formData = new FormData();
+                formData.append('question', message);
+                
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                addMessage(result.answer, 'bot');
+                
+            } catch (error) {
+                addMessage('Sorry, there was an error processing your request. Please try again.', 'bot');
+            } finally {
+                // Re-enable input
+                input.disabled = false;
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = 'Send';
+                input.focus();
+            }
+        }
+        
+        function addMessage(text, sender) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            if (sender === 'bot') {
+                messageDiv.innerHTML = formatBotMessage(text);
+            } else {
+                messageDiv.textContent = text;
+            }
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function formatBotMessage(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+        
+        // Focus on input when page loads
+        window.addEventListener('load', () => {
+            document.getElementById('chatInput').focus();
+        });
+    </script>
+</body>
+</html>
